@@ -1,16 +1,5 @@
 module CoordinationGame where
 
-
--- tests for interacting with lists
-list1 = [1,2,3,4,5]
-list2 = addArray list1
-
-addArray :: [Integer] -> Integer
-addArray [] = 0
-addArray (a:b) = a + addArray(b)
----
-
-
 -- IO basic examples
 -- how to print things in haskell
 io1 = putStrLn "Hello World!"
@@ -47,6 +36,15 @@ main = do
 	str <- getLine
 	checkYes str
 
+	
+-- tests for interacting with lists
+list1 = [1,2,3,4,5]
+list2 = addArray list1
+
+addArray :: [Integer] -> Integer
+addArray [] = 0
+addArray (a:b) = a + addArray(b)
+---
 
 -- boards
 board1 = [[1,2],[3,4],[5,6],[7,8]]
