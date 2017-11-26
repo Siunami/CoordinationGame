@@ -36,8 +36,8 @@ main = do
 	str <- getLine
 	checkYes str
 
-	
--- tests for interacting with lists
+
+-- test for interacting with lists
 list1 = [1,2,3,4,5]
 list2 = addArray list1
 
@@ -55,6 +55,21 @@ nestedArrayAddition [] = 0
 nestedArrayAddition (a:b) = addArray(a) + nestedArrayAddition(b)
 
 
+-- select functions take a board and the integer starting pos 1
+selectTopLeft :: [[Integer]] -> Integer -> [Integer]
+selectTopLeft (a:b) 1 = a
+
+selectTopRight :: [[Integer]] -> Integer -> [Integer]
+selectTopRight (a:b) 2 = a
+selectTopRight (a:b) num = selectTopRight b (num + 1)
+
+selectBottomLeft :: [[Integer]] -> Integer -> [Integer]
+selectBottomLeft (a:b) 3 = a
+selectBottomLeft (a:b) num = selectBottomLeft b (num + 1)
+
+selectBottomRight :: [[Integer]] -> Integer -> [Integer]
+selectBottomRight (a:b) 4 = a
+selectBottomRight (a:b) num = selectBottomRight b (num + 1)
 
 
 
