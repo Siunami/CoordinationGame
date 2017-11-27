@@ -37,7 +37,7 @@ drawing board = pictures [box, lineX, lineY, topLeft, topRight, bottomLeft, bott
 		bottomRight = translate 125 (-200) $ text (show (selectBottomRight board 1))
 
 
--- rendering the window
+-- rendering world state
 defaultMain :: IO()
 defaultMain = display window background (drawing board1)
 
