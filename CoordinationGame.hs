@@ -1,4 +1,10 @@
-module CoordinationGame where
+module CoordinationGame (defaultMain) where
+
+import Graphics.Gloss
+
+
+defaultMain :: IO()
+defaultMain = display (InWindow "Nice Window" (200, 200) (10, 10)) white (Circle 80)
 
 -- IO basic examples
 -- how to print things in haskell
