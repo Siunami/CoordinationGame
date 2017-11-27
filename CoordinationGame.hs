@@ -5,8 +5,8 @@ import Graphics.Gloss
 
 -- window properties
 width, height, offset :: Int
-width = 800
-height = 500
+width = 1500
+height = 1000
 offset = 100
 
 window :: Display
@@ -20,21 +20,21 @@ drawing :: [[Integer]] -> Picture
 drawing board = pictures [box, lineX, lineY, topLeft, topRight, bottomLeft, bottomRight]
 	where
 		-- table
-		box = rectangleWire 500 300
-		lineX = line [(0,-150),(0,150)]
-		lineY = line [(-250,0),(250,0)]
+		box = rectangleWire 1000 600
+		lineY = line [(0,-300),(0,300)]
+		lineX = line [(-500,0),(500,0)]
 
 		-- topLeft returns the board coordinates and renders to top-left position
-		topLeft = translate (-250) 30 $ text (show (selectTopLeft board 1))
+		topLeft = translate (-375) 100 $ text (show (selectTopLeft board 1))
 		
 		-- topRight returns the board coordinates and renders to top-right position
-		topRight = translate 20 30 $ text (show (selectTopRight board 1))
+		topRight = translate 125 100 $ text (show (selectTopRight board 1))
 		
 		-- bottomLeft returns the board coordinates and renders to bottom-left position
-		bottomLeft = translate (-250) (-130) $ text (show (selectBottomLeft board 1))
+		bottomLeft = translate (-375) (-200) $ text (show (selectBottomLeft board 1))
 		
 		-- bottomRight returns the board coordinates and renders to bottom-right position
-		bottomRight = translate 20 (-130) $ text (show (selectBottomRight board 1))
+		bottomRight = translate 125 (-200) $ text (show (selectBottomRight board 1))
 
 
 -- rendering the window
