@@ -16,7 +16,7 @@ background :: Color
 background = white
 
 drawing :: Picture
-drawing = pictures [rectangleWire 500 300]
+drawing = pictures [rectangleWire 500 300, line [(0,0) (200,200)]]
 
 -- rendering the window
 defaultMain :: IO()
