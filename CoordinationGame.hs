@@ -4,9 +4,24 @@ module CoordinationGame (defaultMain) where
 import Graphics.Gloss
 
 
+width, height, offset :: Int
+width = 800
+height = 500
+offset = 100
+
+window :: Display
+window = InWindow "Coordination Game" (width, height) (offset, offset)
+
+background :: Color
+background = white
+
+drawing :: Picture
+drawing = pictures [rectangleWire 500 300]
+
+-- rendering the window
 defaultMain :: IO()
--- example UI
-defaultMain = display (InWindow "Nice Window" (200, 200) (10, 10)) white (Circle 80)
+defaultMain = display window background drawing
+
 
 -- IO basic examples
 -- how to print things in haskell
