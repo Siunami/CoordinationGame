@@ -3,7 +3,7 @@ module CoordinationGame (defaultMain) where
 
 import Graphics.Gloss
 
-
+-- window properties
 width, height, offset :: Int
 width = 800
 height = 500
@@ -15,12 +15,31 @@ window = InWindow "Coordination Game" (width, height) (offset, offset)
 background :: Color
 background = white
 
-drawing :: Picture
-drawing = pictures [rectangleWire 500 300, line [(0,0) (200,200)]]
+-- drawing takes in a board and renders the world state
+drawing :: [[Integer]] -> Picture
+drawing board = pictures [box, lineX, lineY, topLeft, topRight, bottomLeft, bottomRight]
+	where
+		-- table
+		box = rectangleWire 500 300
+		lineX = line [(0,-150),(0,150)]
+		lineY = line [(-250,0),(250,0)]
+
+		-- topLeft returns the board coordinates and renders to top-left position
+		topLeft = translate (-250) 30 $ text (show (selectTopLeft board 1))
+		
+		-- topRight returns the board coordinates and renders to top-right position
+		topRight = translate 20 30 $ text (show (selectTopRight board 1))
+		
+		-- bottomLeft returns the board coordinates and renders to bottom-left position
+		bottomLeft = translate (-250) (-130) $ text (show (selectBottomLeft board 1))
+		
+		-- bottomRight returns the board coordinates and renders to bottom-right position
+		bottomRight = translate 20 (-130) $ text (show (selectBottomRight board 1))
+
 
 -- rendering the window
 defaultMain :: IO()
-defaultMain = display window background drawing
+defaultMain = display window background (drawing board1)
 
 
 -- IO basic examples
