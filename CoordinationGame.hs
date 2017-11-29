@@ -2,6 +2,10 @@
 module CoordinationGame (defaultMain) where
 
 import Graphics.Gloss
+import Graphics.Gloss.Data.ViewPort
+import Graphics.Gloss.Data.Picture
+import Graphics.Gloss.Data.Color
+import Graphics.Gloss.Data.Bitmap
 
 -- window properties
 width, height, offset :: Int
@@ -15,41 +19,8 @@ window = InWindow "Coordination Game" (width, height) (offset, offset)
 background :: Color
 background = white
 
--- drawing takes in a board and renders the world state
-drawing :: [[Integer]] -> Picture
-drawing board = pictures [box, lineX, lineY, 
-							topLeft, topRight, 
-							bottomLeft, bottomRight,
-							p1Score,
-							p2Score]
-	where
-		-- table
-		box = rectangleWire 1000 600
-		lineY = line [(0,-300),(0,300)]
-		lineX = line [(-500,0),(500,0)]
-
-		p1Score = translate (-500) 350 $ text ("Player 1 Score: " ++ (show 000)) -- replace 000 with variable
-		p2Score = translate (-500) (-450) $ text ("Player 2 Score: " ++ (show 000)) -- replace 000 with variable
-
-		-- topLeft returns the board coordinates and renders to top-left position
-		topLeft = translate (-375) 100 $ text (show (selectTopLeft board 1))
-		
-		-- topRight returns the board coordinates and renders to top-right position
-		topRight = translate 125 100 $ text (show (selectTopRight board 1))
-		
-		-- bottomLeft returns the board coordinates and renders to bottom-left position
-		bottomLeft = translate (-375) (-200) $ text (show (selectBottomLeft board 1))
-		
-		-- bottomRight returns the board coordinates and renders to bottom-right position
-		bottomRight = translate 125 (-200) $ text (show (selectBottomRight board 1))
 
 
--- rendering world state
--- number of games with boards
-defaultMain :: IO()
-defaultMain = display window background (drawing board1)
-
-{-
 -- data structure to hold state of game
 -- player1 turn to select rows
 -- player2 turn to select column
@@ -79,34 +50,56 @@ initialState = Game
 -- draw game state (convert it to picture)
 render :: CoordinationGame -> Picture
 render game =
-	pictures [box, lineX, lineY, topLeft, topRight, bottomLeft, bottomRight]
+	pictures [box, lineX, lineY, 
+							topLeft, topRight, 
+							bottomLeft, bottomRight,
+							p1Score,
+							p2Score] -- add player# game here
+									 -- player# selections
 	where
 		-- table
 		box = rectangleWire 1000 600
 		lineY = line [(0,-300),(0,300)]
 		lineX = line [(-500,0),(500,0)]
 
+		p1Score = translate (-500) 350 $ text ("Player 1 Score: " ++ (show 0)) 
+		p2Score = translate (-500) (-450) $ text ("Player 2 Score: " ++ (show 0)) 
+
 		-- topLeft returns the board coordinates and renders to top-left position
-		topLeft = translate (-375) 100 $ text (show (selectTopLeft board 1))
+		topLeft = translate (-375) 100 $ text (show (selectTopLeft (board game) 1))
 		
 		-- topRight returns the board coordinates and renders to top-right position
-		topRight = translate 125 100 $ text (show (selectTopRight board 1))
+		topRight = translate 125 100 $ text (show (selectTopRight (board game) 1))
 		
 		-- bottomLeft returns the board coordinates and renders to bottom-left position
-		bottomLeft = translate (-375) (-200) $ text (show (selectBottomLeft board 1))
+		bottomLeft = translate (-375) (-200) $ text (show (selectBottomLeft (board game) 1))
 		
 		-- bottomRight returns the board coordinates and renders to bottom-right position
-		bottomRight = translate 125 (-200) $ text (show (selectBottomRight board 1))
+		bottomRight = translate 125 (-200) $ text (show (selectBottomRight (board game) 1))
+
+
+--simulate :: Display -> Color -> Int -> initState -> (initState -> Picture) -> (ViewPort -> Float -> initState -> initState) -> IO()
+
+-- | Number of frames to show per second.
+fps :: Int
+fps = 30
+
+updateGame :: Float -> CoordinationGame -> CoordinationGame
+updateGame seconds game = game { board = [[1,1],[1,1],[1,1],[1,1]] }
+
+-- | Update the game when player2 makes a selection.
+update :: ViewPort -> Float -> CoordinationGame -> CoordinationGame
+update _ = updateGame
+
+-- rendering world state
+-- number of games with boards
+defaultMain :: IO()
+defaultMain = simulate window background fps initialState render update
 
 
 
 
 
-
-
-
-
--}
 
 
 
