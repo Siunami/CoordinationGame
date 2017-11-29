@@ -38,8 +38,27 @@ drawing board = pictures [box, lineX, lineY, topLeft, topRight, bottomLeft, bott
 
 
 -- rendering world state
+-- number of games with boards
 defaultMain :: IO()
 defaultMain = display window background (drawing board1)
+
+-- data structure to hold state of game
+-- player1 turn to select rows
+-- player2 turn to select column
+-- score of player1
+-- score of player2
+data CoordinationGame = Game
+	{	player1 :: [Integer] -- player1's coordinates chosen
+	,	player2 :: [Integer] -- player2's coordinates chosen
+	,	scoreP1 :: Integer -- score of player1
+	,	scoreP2 :: Integer -- score of player2
+	} deriving Show
+
+-- draw game state (convert it to picture)
+render :: CoordinationGame -> Picture
+
+-- initialize game with this game state
+initialState :: CoordinationGame
 
 
 -- IO basic examples
