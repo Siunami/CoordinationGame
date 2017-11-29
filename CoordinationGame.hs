@@ -17,12 +17,19 @@ background = white
 
 -- drawing takes in a board and renders the world state
 drawing :: [[Integer]] -> Picture
-drawing board = pictures [box, lineX, lineY, topLeft, topRight, bottomLeft, bottomRight]
+drawing board = pictures [box, lineX, lineY, 
+							topLeft, topRight, 
+							bottomLeft, bottomRight,
+							p1Score,
+							p2Score]
 	where
 		-- table
 		box = rectangleWire 1000 600
 		lineY = line [(0,-300),(0,300)]
 		lineX = line [(-500,0),(500,0)]
+
+		p1Score = translate (-500) 350 $ text ("Player 1 Score: " ++ (show 000)) -- replace 000 with variable
+		p2Score = translate (-500) (-450) $ text ("Player 2 Score: " ++ (show 000)) -- replace 000 with variable
 
 		-- topLeft returns the board coordinates and renders to top-left position
 		topLeft = translate (-375) 100 $ text (show (selectTopLeft board 1))
@@ -42,23 +49,69 @@ drawing board = pictures [box, lineX, lineY, topLeft, topRight, bottomLeft, bott
 defaultMain :: IO()
 defaultMain = display window background (drawing board1)
 
+{-
 -- data structure to hold state of game
 -- player1 turn to select rows
 -- player2 turn to select column
 -- score of player1
 -- score of player2
+-- board loaded
 data CoordinationGame = Game
 	{	player1 :: [Integer] -- player1's coordinates chosen
 	,	player2 :: [Integer] -- player2's coordinates chosen
 	,	scoreP1 :: Integer -- score of player1
 	,	scoreP2 :: Integer -- score of player2
+	,	board :: [[Integer]]
 	} deriving Show
+
+
+-- initialize game (starting state for coordination game)
+initialState :: CoordinationGame
+initialState = Game
+	{	player1 = [0,0]
+	,	player2 = [0,0]
+	,	scoreP1 = 0
+	,	scoreP2 = 0
+	,	board = [[0,0],[0,0],[0,0],[0,0]]
+	}
+
 
 -- draw game state (convert it to picture)
 render :: CoordinationGame -> Picture
+render game =
+	pictures [box, lineX, lineY, topLeft, topRight, bottomLeft, bottomRight]
+	where
+		-- table
+		box = rectangleWire 1000 600
+		lineY = line [(0,-300),(0,300)]
+		lineX = line [(-500,0),(500,0)]
 
--- initialize game with this game state
-initialState :: CoordinationGame
+		-- topLeft returns the board coordinates and renders to top-left position
+		topLeft = translate (-375) 100 $ text (show (selectTopLeft board 1))
+		
+		-- topRight returns the board coordinates and renders to top-right position
+		topRight = translate 125 100 $ text (show (selectTopRight board 1))
+		
+		-- bottomLeft returns the board coordinates and renders to bottom-left position
+		bottomLeft = translate (-375) (-200) $ text (show (selectBottomLeft board 1))
+		
+		-- bottomRight returns the board coordinates and renders to bottom-right position
+		bottomRight = translate 125 (-200) $ text (show (selectBottomRight board 1))
+
+
+
+
+
+
+
+
+
+-}
+
+
+
+
+
 
 
 -- IO basic examples
