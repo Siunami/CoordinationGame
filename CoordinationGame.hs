@@ -12,8 +12,8 @@ import Control.Exception
 
 -- | Window properties
 width, height, offset :: Int
-width = 1500
-height = 1000
+width = 1800
+height = 1500
 offset = 100
 
 -- | Window background color
@@ -75,7 +75,7 @@ initialState = Game
 	,	p2Select = False
 	,	p1Selection = 0
 	,	p2Selection = 0
-	,	turnP1 = False
+	,	turnP1 = True
 	-- Selection is 1 or 2, 0 for unchosen
 		--lob = boardList
 	}
@@ -89,21 +89,30 @@ renderStart game =
 							bottomLeft, bottomRight,
 							p1Score,
 							p2Score,
-							showP1Turn]
+							showTurn,
+							p1Agree,
+							p1Disagree,
+							p2Agree,
+							p2Disagree]
 
 	where
 
-		showP1Turn = if turnP1 game == True 
-						then rotate (-90) (translate (-500) (600) $ text ("Player 1 Turn"))
-							else rotate (-90) (translate (-500) (600) $ text ("Player 2 Turn"))
+		p1Agree = (translate (-600) (100) $ text ("A"))
+		p1Disagree = (translate (-600) (-200) $ text ("D"))
+		p2Agree = (translate (-300) (320) $ text ("A"))
+		p2Disagree = (translate (200) (320) $ text ("D"))
+
+		showTurn = if turnP1 game == True 
+						then rotate (-90) (translate (-500) (700) $ text ("Player 1 Turn"))
+							else rotate (-90) (translate (-500) (700) $ text ("Player 2 Turn"))
 
 		-- table
 		box = rectangleWire 1000 600
 		lineY = line [(0,-300),(0,300)]
 		lineX = line [(-500,0),(500,0)]
 
-		p1Score = translate (-500) 350 $ text ("Player 1 Score: " ++ (show (scoreP1 game))) 
-		p2Score = translate (-500) (-450) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
+		p1Score = translate (-500) 500 $ text ("Player 1 Score: " ++ (show (scoreP1 game))) 
+		p2Score = translate (-500) (-500) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
 
 		-- topLeft returns the board coordinates and renders to top-left position
 		topLeft = translate (-375) 100 $ text (show (selectTopLeft (board game) 1))
