@@ -41,7 +41,6 @@ data CoordinationGame = Game
 	, 	selectP1 :: [[Integer]]
 	,	selectP2 :: [[Integer]]
 	, 	boardList :: [[[Integer]]]
-	,	endGame :: Bool
 	,	p1Select :: Bool
 	,	p2Select :: Bool
 	,	p1Selection :: Integer
@@ -69,7 +68,6 @@ initialState = Game
 	,	board = board1
 	,	selectP1 = [[]]
 	,	selectP2 = [[]]
-	,	endGame = False
 	,	boardList = [board1, board2, board3, board4, board5, board6]
 	,	p1Select = False
 	,	p2Select = False
@@ -104,15 +102,15 @@ renderStart game =
 
 		showTurn = if turnP1 game == True 
 						then rotate (-90) (translate (-500) (700) $ text ("Player 1 Turn"))
-							else rotate (-90) (translate (-500) (700) $ text ("Player 2 Turn"))
+							else translate (-500) (500) $ text ("Player 2 Turn")
 
 		-- table
 		box = rectangleWire 1000 600
 		lineY = line [(0,-300),(0,300)]
 		lineX = line [(-500,0),(500,0)]
 
-		p1Score = translate (-500) 500 $ text ("Player 1 Score: " ++ (show (scoreP1 game))) 
-		p2Score = translate (-500) (-500) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
+		p1Score = translate (-500) (-500) $ text ("Player 1 Score: " ++ (show (scoreP1 game))) 
+		p2Score = translate (-500) (-650) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
 
 		-- topLeft returns the board coordinates and renders to top-left position
 		topLeft = translate (-375) 100 $ text (show (selectTopLeft (board game) 1))
@@ -126,12 +124,12 @@ renderEnd game =
 
 	where
 		p1Score = translate (-500) 350 $ text ("Player 1 Score: " ++ (show (scoreP1 game))) 
-		p2Score = translate (-500) (-450) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
+		p2Score = translate (-500) (-350) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
 		showScore = if (scoreP1 game > scoreP2 game) then translate (-500) 0 $ text ("Player 1 Wins") else translate (-500) 0 $ text ("Player 2 Wins")
 
 chooseRender :: CoordinationGame -> Picture
 chooseRender game =
-	if (endGame game)
+	if (board game == [])
 		then renderEnd game
 		else renderStart game
 
