@@ -25,28 +25,19 @@ window :: Display
 window = InWindow "Coordination Game" (width, height) (offset, offset)
 
 
---board1 = []
--- data structure to hold state of game
--- player1 turn to select rows
--- player2 turn to select column
--- score of player1
--- score of player2
--- board loaded
+-- | Game data structure
 data CoordinationGame = Game
-	--{	player1 :: [Integer] -- player1's coordinates chosen
-	--,	player2 :: [Integer] -- player2's coordinates chosen
-	{	scoreP1 :: Integer -- score of player1
-	,	scoreP2 :: Integer -- score of player2
-	,	board :: [[Integer]]
+	{	scoreP1 :: Integer 			-- score of player1
+	,	scoreP2 :: Integer 			-- score of player2
+	,	board :: [[Integer]]		-- current board
 	, 	selectP1 :: [[Integer]]
 	,	selectP2 :: [[Integer]]
-	, 	boardList :: [[[Integer]]]
+	, 	boardList :: [[[Integer]]]	-- list of boards
 	,	p1Select :: Bool
 	,	p2Select :: Bool
 	,	p1Selection :: Integer
 	,	p2Selection :: Integer
-	,	turnP1 :: Bool
-	,	turnP2 :: Bool
+	,	turnP1 :: Bool 				-- player1 turn
 	
 	} deriving Show
 
@@ -58,12 +49,10 @@ board5 = [[3,5],[2,2],[2,2],[5,3]]
 board6 = [[2,7],[5,0],[0,5],[7,2]]
 
 
--- initialize game (starting state for coordination game)
+-- | Initialize game (starting state for coordination game)
 initialState :: CoordinationGame
 initialState = Game
-	{	--player1 = [0,0]
-	--,	player2 = [0,0]
-		scoreP1 = 0
+	{	scoreP1 = 0
 	,	scoreP2 = 0
 	,	board = board1
 	,	selectP1 = [[]]
@@ -74,12 +63,10 @@ initialState = Game
 	,	p1Selection = 0
 	,	p2Selection = 0
 	,	turnP1 = True
-	-- Selection is 1 or 2, 0 for unchosen
-		--lob = boardList
 	}
 
 
--- draw game state (convert it to picture)
+-- | Draw game state (convert it to picture)
 renderStart :: CoordinationGame -> Picture
 renderStart game =
 	pictures [box, lineX, lineY, 
@@ -104,7 +91,7 @@ renderStart game =
 						then rotate (-90) (translate (-500) (700) $ text ("Player 1 Turn"))
 							else translate (-500) (500) $ text ("Player 2 Turn")
 
-		-- table
+		-- matrix table
 		box = rectangleWire 1000 600
 		lineY = line [(0,-300),(0,300)]
 		lineX = line [(-500,0),(500,0)]
@@ -118,6 +105,7 @@ renderStart game =
 		bottomLeft = translate (-375) (-200) $ text (show (selectBottomLeft (board game) 1))
 		bottomRight = translate 125 (-200) $ text (show (selectBottomRight (board game) 1))
 
+-- | Draws end game state
 renderEnd :: CoordinationGame -> Picture
 renderEnd game =
 	pictures [p1Score, p2Score, showScore]
@@ -127,6 +115,7 @@ renderEnd game =
 		p2Score = translate (-500) (-350) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
 		showScore = if (scoreP1 game > scoreP2 game) then translate (-500) 0 $ text ("Player 1 Wins") else translate (-500) 0 $ text ("Player 2 Wins")
 
+-- | Draw game state based on current board
 chooseRender :: CoordinationGame -> Picture
 chooseRender game =
 	if (board game == [])
@@ -135,8 +124,8 @@ chooseRender game =
 
 
 
--- rendering world state
--- number of games with boards
+
+-- | Renders world state
 defaultMain :: IO()
 defaultMain = play window background 5 initialState chooseRender handleInput step
 	
@@ -241,27 +230,10 @@ handleInput (EventKey (Char '4') _ _ _) game =
 -- do nothing if other keys are pressed
 handleInput _ game = game
 
+-- | Steps through game state
 step :: Float -> CoordinationGame -> CoordinationGame
 step _ w = w
 
-
-----  | Player 1 selects key 1
---handleInput (EventKey (Char '1') _ _ _) game =
---	game { selectP1 = take 2 board }
-
----- | Player 1 selects key 2
---handleInput (EventKey (Char '2') _ _ _) game =
---  	game { selectP1 = drop 2 board }
-
--- | Player 2 selects key 3
---handleInput (EventKey (Char '3') _ _ _) game =
-
--- | Player 2 selects key 4
---handleInput (EventKey (Char '4') _ _ _) game =
-
-
--- Do nothing for all other events.
---handleInput _ game = game
 
 
 --nashEquilibrium :: [[Integer]] -> Integer -> Float
