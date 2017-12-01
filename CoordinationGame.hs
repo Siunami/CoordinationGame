@@ -46,7 +46,9 @@ data CoordinationGame = Game
 	,	p2Select :: Bool
 	,	p1Selection :: Integer
 	,	p2Selection :: Integer
-	--	lob :: [[[Integer]]]
+	,	turnP1 :: Bool
+	,	turnP2 :: Bool
+	
 	} deriving Show
 
 board1 = [[4,4],[3,1],[1,3],[2,2]]
@@ -73,6 +75,7 @@ initialState = Game
 	,	p2Select = False
 	,	p1Selection = 0
 	,	p2Selection = 0
+	,	turnP1 = False
 	-- Selection is 1 or 2, 0 for unchosen
 		--lob = boardList
 	}
@@ -85,9 +88,15 @@ renderStart game =
 							topLeft, topRight, 
 							bottomLeft, bottomRight,
 							p1Score,
-							p2Score]
+							p2Score,
+							showP1Turn]
 
 	where
+
+		showP1Turn = if turnP1 game == True 
+						then rotate (-90) (translate (-500) (600) $ text ("Player 1 Turn"))
+							else rotate (-90) (translate (-500) (600) $ text ("Player 2 Turn"))
+
 		-- table
 		box = rectangleWire 1000 600
 		lineY = line [(0,-300),(0,300)]
@@ -165,7 +174,7 @@ handleInput (EventKey (Char 'a') Down _ _) game =
 	if p2Select game && p1Select game
 		then
 			game { board = case listToMaybe (boardList game) of
-								Nothing -> [[]]
+								Nothing -> []
 								Just first -> first
 				
 
@@ -182,11 +191,11 @@ handleInput (EventKey (Char 'a') Down _ _) game =
 			else
 				if not(p2Select game) && p1Select game
 					then
-						game { p2Select = True, p2Selection = 1, scoreP2 = 0 }
+						game { p2Select = True, turnP1 = False, p2Selection = 1, scoreP2 = 0 }
 						else
 							if not(p1Select game)
 								then
-									game { p1Select = True, p1Selection = 1, scoreP1 = 0 }
+									game { p1Select = True, turnP1 = True, p1Selection = 1, scoreP1 = 0 }
 									else 
 										game
 
