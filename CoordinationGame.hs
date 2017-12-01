@@ -40,6 +40,11 @@ data CoordinationGame = Game
 	,	selectP2 :: [[Integer]]
 	, 	boardList :: [[[Integer]]]
 	,	endGame :: Bool
+	,	p1Select :: Bool
+	,	p2Select :: Bool
+	,	p1Selection :: Integer
+	,	p2Selection :: Integer
+	,	lob :: [[[Integer]]]
 	} deriving Show
 
 board1 = [[4,4],[3,1],[1,3],[2,2]]
@@ -48,6 +53,7 @@ board3 = [[5,5],[6,4],[4,6],[4,4]]
 board4 = [[2,2],[2,0],[0,2],[0,0]]
 board5 = [[3,5],[2,2],[2,2],[5,3]]
 board6 = [[2,7],[5,0],[0,5],[7,2]]
+
 
 -- initialize game (starting state for coordination game)
 initialState :: CoordinationGame
@@ -61,6 +67,13 @@ initialState = Game
 	,	selectP2 = [[]]
 	,	endGame = False
 	,	boardList = [board1, board2, board3, board4, board5, board6]
+	,	p1Select = False
+	,	p2Select = False
+	,	p1Selection = 0
+	,	p2Selection = 0
+	-- Selection is 1 or 2, 0 for unchosen
+	,	board = board1
+	,	lob = boardList
 	}
 
 
@@ -104,6 +117,7 @@ chooseRender game =
 		else renderStart game
 
 
+
 -- rendering world state
 -- number of games with boards
 defaultMain :: IO()
@@ -111,17 +125,65 @@ defaultMain = play window background 5 initialState chooseRender handleInput ste
 	
 
 
+
+--getGrid :: Boolean -> Boolean -> Integer
+
+--getGrid True True = 1
+--getGrid True False = 2
+--getGrid False True = 3
+--getGrid False False = 4
+
+--calculateScoreP1 :: [[Integer]] -> Boolean -> Boolean -> Integer
+--calculateScoreP1 b p1 p2 = 
+
+
 -- | Player selects keys 
 handleInput :: Event -> CoordinationGame -> CoordinationGame
 
+
 -- | Player 1 selects key 1 selects row 1
+{-
 handleInput (EventKey (Char '1') _ _ _) game =
 	game { selectP1 = take 2 (board game) }
+	-}
 
+handleInput (EventKey (Char 'a') Down _ _) game =
+	--if not(p1Select game)
+	--	then
+	--		game { p1Select = True, scoreP1 = 1 }
+	--	else if not(p2Select game) && p1Select game
+	--		then
+	--			game { p2Select = True, scoreP2 = 5 }
+	--		else if p2Select game && p1Select game
+	--			then
+	--				game { board = board2, p2Select = False, p1Select = False, scoreP1 = 2 }
+	--			else 
+	--				game { board = board2, scoreP2 = 3 }
+	if p2Select game && p1Select game
+		then
+			game { board = 
+				board2, 
+				p2Selection = 0,
+				p1Selection = 0, 
+				p2Select = False, 
+				p1Select = False, 
+				scoreP1 = 2 
+			}
+		else if not(p2Select game) && p1Select game
+			then
+				game { p2Select = True, p2Selection = 1, scoreP2 = 0 }
+			else if not(p1Select game)
+				then
+					game { p1Select = True, p1Selection = 1, scoreP1 = 0 }
+				else 
+					game
+
+{-
 -- | Player 1 selects key 2 selects row 2
 handleInput (EventKey (Char '2') _ _ _) game =
   	game { selectP1 = drop 2 (board game)
   		, endGame = True }
+
 
 -- | Player 2 selects key 3 selects column 1
 handleInput (EventKey (Char '3') _ _ _) game =
@@ -133,10 +195,46 @@ handleInput (EventKey (Char '4') _ _ _) game =
 
 -- Do nothing for all other events.
 --handleInput _ game = game
+-}
+
+--game { board = board2 }
+
+--handleInput (EventKey (Char 'd') _ _ _) game =
+--	if notp1Select game
+--		then do
+--			game { notp1Select = False, p1Selection = 2, scoreP1 = 1 }
+--		else if notp2Select game && not(notp1Select game)
+--			then
+--				game { notp2Select = False, p2Selection = 2, scoreP2 = 1 }
+--			else if not(notp2Select game) && not(notp1Select game)
+--				then
+--				game { board = board2, notp2Select = False, notp1Select = False, scoreP1 = 2 }
+
+-- do nothing if other keys are pressed
 handleInput _ game = game
 
 step :: Float -> CoordinationGame -> CoordinationGame
 step _ w = w
+
+
+----  | Player 1 selects key 1
+--handleInput (EventKey (Char '1') _ _ _) game =
+--	game { selectP1 = take 2 board }
+
+---- | Player 1 selects key 2
+--handleInput (EventKey (Char '2') _ _ _) game =
+--  	game { selectP1 = drop 2 board }
+
+-- | Player 2 selects key 3
+--handleInput (EventKey (Char '3') _ _ _) game =
+
+-- | Player 2 selects key 4
+--handleInput (EventKey (Char '4') _ _ _) game =
+
+
+-- Do nothing for all other events.
+--handleInput _ game = game
+
 
 --nashEquilibrium :: [[Integer]] -> Integer -> Float
 --nashEquilibrium board 
@@ -220,6 +318,7 @@ selectBottomLeft (a:b) num = selectBottomLeft b (num + 1)
 selectBottomRight :: [[Integer]] -> Integer -> [Integer]
 selectBottomRight (a:b) 4 = a
 selectBottomRight (a:b) num = selectBottomRight b (num + 1)
+
 
 
 
