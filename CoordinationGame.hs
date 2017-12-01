@@ -1,26 +1,29 @@
--- run exec from CoordinationGame/dist/build/CoordinationGame/CoordinationGame
 module CoordinationGame (defaultMain) where
 
+import Graphics.Gloss (play, Display(InWindow))
 import Graphics.Gloss
 import Graphics.Gloss.Data.ViewPort
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Color
 import Graphics.Gloss.Data.Bitmap
+import Graphics.Gloss.Interface.Pure.Game
 
--- window properties
+-- | Window properties
 width, height, offset :: Int
 width = 1500
 height = 1000
 offset = 100
 
-window :: Display
-window = InWindow "Coordination Game" (width, height) (offset, offset)
-
+-- | Window background color
 background :: Color
 background = white
 
+-- | Creates window
+window :: Display
+window = InWindow "Coordination Game" (width, height) (offset, offset)
 
 
+--board1 = []
 -- data structure to hold state of game
 -- player1 turn to select rows
 -- player2 turn to select column
@@ -28,81 +31,124 @@ background = white
 -- score of player2
 -- board loaded
 data CoordinationGame = Game
-	{	player1 :: [Integer] -- player1's coordinates chosen
-	,	player2 :: [Integer] -- player2's coordinates chosen
-	,	scoreP1 :: Integer -- score of player1
+	--{	player1 :: [Integer] -- player1's coordinates chosen
+	--,	player2 :: [Integer] -- player2's coordinates chosen
+	{	scoreP1 :: Integer -- score of player1
 	,	scoreP2 :: Integer -- score of player2
 	,	board :: [[Integer]]
+	, 	selectP1 :: [[Integer]]
+	,	selectP2 :: [[Integer]]
+	, 	boardList :: [[[Integer]]]
+	,	endGame :: Bool
 	} deriving Show
 
+board1 = [[4,4],[3,1],[1,3],[2,2]]
+board2 = [[3,3],[5,0],[0,5],[0,0]]
+board3 = [[5,5],[6,4],[4,6],[4,4]]
+board4 = [[2,2],[2,0],[0,2],[0,0]]
+board5 = [[3,5],[2,2],[2,2],[5,3]]
+board6 = [[2,7],[5,0],[0,5],[7,2]]
 
 -- initialize game (starting state for coordination game)
 initialState :: CoordinationGame
 initialState = Game
-	{	player1 = [0,0]
-	,	player2 = [0,0]
-	,	scoreP1 = 0
+	{	--player1 = [0,0]
+	--,	player2 = [0,0]
+		scoreP1 = 0
 	,	scoreP2 = 0
-	,	board = [[0,0],[0,0],[0,0],[0,0]]
+	,	board = board1
+	,	selectP1 = [[]]
+	,	selectP2 = [[]]
+	,	endGame = False
+	,	boardList = [board1, board2, board3, board4, board5, board6]
 	}
 
 
 -- draw game state (convert it to picture)
-render :: CoordinationGame -> Picture
-render game =
+renderStart :: CoordinationGame -> Picture
+renderStart game =
 	pictures [box, lineX, lineY, 
 							topLeft, topRight, 
 							bottomLeft, bottomRight,
 							p1Score,
-							p2Score] -- add player# game here
-									 -- player# selections
+							p2Score]
+
 	where
 		-- table
 		box = rectangleWire 1000 600
 		lineY = line [(0,-300),(0,300)]
 		lineX = line [(-500,0),(500,0)]
 
-		p1Score = translate (-500) 350 $ text ("Player 1 Score: " ++ (show 0)) 
-		p2Score = translate (-500) (-450) $ text ("Player 2 Score: " ++ (show 0)) 
+		p1Score = translate (-500) 350 $ text ("Player 1 Score: " ++ (show (scoreP1 game))) 
+		p2Score = translate (-500) (-450) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
 
 		-- topLeft returns the board coordinates and renders to top-left position
 		topLeft = translate (-375) 100 $ text (show (selectTopLeft (board game) 1))
-		
-		-- topRight returns the board coordinates and renders to top-right position
 		topRight = translate 125 100 $ text (show (selectTopRight (board game) 1))
-		
-		-- bottomLeft returns the board coordinates and renders to bottom-left position
 		bottomLeft = translate (-375) (-200) $ text (show (selectBottomLeft (board game) 1))
-		
-		-- bottomRight returns the board coordinates and renders to bottom-right position
 		bottomRight = translate 125 (-200) $ text (show (selectBottomRight (board game) 1))
 
+renderEnd :: CoordinationGame -> Picture
+renderEnd game =
+	pictures [p1Score, p2Score, showScore]
 
---simulate :: Display -> Color -> Int -> initState -> (initState -> Picture) -> (ViewPort -> Float -> initState -> initState) -> IO()
+	where
+		p1Score = translate (-500) 350 $ text ("Player 1 Score: " ++ (show (scoreP1 game))) 
+		p2Score = translate (-500) (-450) $ text ("Player 2 Score: " ++ (show (scoreP2 game))) 
+		showScore = if (scoreP1 game > scoreP2 game) then translate (-500) 0 $ text ("Player 1 Wins") else translate (-500) 0 $ text ("Player 2 Wins")
 
--- | Number of frames to show per second.
-fps :: Int
-fps = 30
+chooseRender :: CoordinationGame -> Picture
+chooseRender game =
+	if (endGame game)
+		then renderEnd game
+		else renderStart game
 
-updateGame :: Float -> CoordinationGame -> CoordinationGame
-updateGame seconds game = game { board = [[1,1],[1,1],[1,1],[1,1]] }
-
--- | Update the game when player2 makes a selection.
-update :: ViewPort -> Float -> CoordinationGame -> CoordinationGame
-update _ = updateGame
 
 -- rendering world state
 -- number of games with boards
 defaultMain :: IO()
-defaultMain = simulate window background fps initialState render update
+defaultMain = play window background 5 initialState chooseRender handleInput step
+	
 
 
+-- | Player selects keys 
+handleInput :: Event -> CoordinationGame -> CoordinationGame
 
+-- | Player 1 selects key 1 selects row 1
+handleInput (EventKey (Char '1') _ _ _) game =
+	game { selectP1 = take 2 (board game) }
 
+-- | Player 1 selects key 2 selects row 2
+handleInput (EventKey (Char '2') _ _ _) game =
+  	game { selectP1 = drop 2 (board game)
+  		, endGame = True }
 
+-- | Player 2 selects key 3 selects column 1
+handleInput (EventKey (Char '3') _ _ _) game =
+	game { selectP2 = take 1 (board game) ++ take 1 (drop 2 (board game)) }
 
+-- | Player 2 selects key 4 selects column 2
+handleInput (EventKey (Char '4') _ _ _) game =
+	game { selectP2 = take 1 (drop 1 (board game)) ++ drop 3 (board game) }
 
+-- Do nothing for all other events.
+--handleInput _ game = game
+handleInput _ game = game
 
+step :: Float -> CoordinationGame -> CoordinationGame
+step _ w = w
+
+--nashEquilibrium :: [[Integer]] -> Integer -> Float
+--nashEquilibrium board 
+
+-- num equals 1 initially
+selectFirst :: [Integer] -> Integer -> Integer
+selectFirst (a:b) 1 = a
+selectFirst (a:b) num = selectFirst b (num + 1)
+
+selectSecond :: [Integer] -> Integer -> Integer
+selectSecond (a:b) 2 = a
+selectSecond (a:b) num = selectSecond b (num + 1)
 
 
 
@@ -152,9 +198,6 @@ addArray :: [Integer] -> Integer
 addArray [] = 0
 addArray (a:b) = a + addArray(b)
 ---
-
--- boards
-board1 = [[1,2],[3,4],[5,6],[7,8]]
 
 -- method to add board values using addArray helper defined above
 nestedArrayAddition :: [[Integer]] -> Integer
