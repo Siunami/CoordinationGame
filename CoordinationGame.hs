@@ -7,6 +7,8 @@ import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Color
 import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Interface.Pure.Game
+import Data.Maybe
+import Control.Exception
 
 -- | Window properties
 width, height, offset :: Int
@@ -158,24 +160,35 @@ handleInput (EventKey (Char 'a') Down _ _) game =
 	--				game { board = board2, p2Select = False, p1Select = False, scoreP1 = 2 }
 	--			else 
 	--				game { board = board2, scoreP2 = 3 }
+
+	
 	if p2Select game && p1Select game
 		then
-			game { board = (boardList game)!!0
-				, boardList = drop 1 (boardList game)
-				, p2Selection = 0,
+			game { board = case listToMaybe (boardList game) of
+								Nothing -> [[]]
+								Just first -> first
+				
+
+
+				,
+				boardList = drop 1 (boardList game),
+				p2Selection = 0,
 				p1Selection = 0, 
 				p2Select = False, 
 				p1Select = False, 
-				scoreP1 = 2 
+				scoreP1 = 2
 			}
-		else if not(p2Select game) && p1Select game
-			then
-				game { p2Select = True, p2Selection = 1, scoreP2 = 0 }
-			else if not(p1Select game)
-				then
-					game { p1Select = True, p1Selection = 1, scoreP1 = 0 }
-				else 
-					game
+
+			else
+				if not(p2Select game) && p1Select game
+					then
+						game { p2Select = True, p2Selection = 1, scoreP2 = 0 }
+						else
+							if not(p1Select game)
+								then
+									game { p1Select = True, p1Selection = 1, scoreP1 = 0 }
+									else 
+										game
 
 {-
 -- | Player 1 selects key 2 selects row 2
