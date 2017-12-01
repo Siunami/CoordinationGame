@@ -44,7 +44,7 @@ data CoordinationGame = Game
 	,	p2Select :: Bool
 	,	p1Selection :: Integer
 	,	p2Selection :: Integer
-	,	lob :: [[[Integer]]]
+	--	lob :: [[[Integer]]]
 	} deriving Show
 
 board1 = [[4,4],[3,1],[1,3],[2,2]]
@@ -72,8 +72,7 @@ initialState = Game
 	,	p1Selection = 0
 	,	p2Selection = 0
 	-- Selection is 1 or 2, 0 for unchosen
-	,	board = board1
-	,	lob = boardList
+		--lob = boardList
 	}
 
 
@@ -161,9 +160,9 @@ handleInput (EventKey (Char 'a') Down _ _) game =
 	--				game { board = board2, scoreP2 = 3 }
 	if p2Select game && p1Select game
 		then
-			game { board = 
-				board2, 
-				p2Selection = 0,
+			game { board = (boardList game)!!0
+				, boardList = drop 1 (boardList game)
+				, p2Selection = 0,
 				p1Selection = 0, 
 				p2Select = False, 
 				p1Select = False, 
