@@ -38,7 +38,7 @@ data CoordinationGame = Game
 	,	p1Selection :: Integer
 	,	p2Selection :: Integer
 	,	turnP1 :: Bool 				-- player1 turn
-	
+	,	turnP2 :: Bool
 	} deriving Show
 
 board1 = [[4,4],[3,1],[1,3],[2,2]]
@@ -57,7 +57,7 @@ initialState = Game
 	,	board = board1
 	,	selectP1 = [[]]
 	,	selectP2 = [[]]
-	,	boardList = [board1, board2, board3, board4, board5, board6]
+	,	boardList = [board2, board3, board4, board5, board6]
 	,	p1Select = False
 	,	p2Select = False
 	,	p1Selection = 0
@@ -87,9 +87,13 @@ renderStart game =
 		p2Agree = (translate (-300) (320) $ text ("A"))
 		p2Disagree = (translate (200) (320) $ text ("D"))
 
-		showTurn = if turnP1 game == True 
+		showTurn = if turnP1 game == True && not(p2Select game) || not(p1Select game)
 						then rotate (-90) (translate (-500) (700) $ text ("Player 1 Turn"))
-							else translate (-500) (500) $ text ("Player 2 Turn")
+							else if turnP1 game == False && not(p2Select game) || not(p1Select game) 
+								then
+									translate (-500) (500) $ text ("Player 2 Turn")
+								else
+									rotate (-90) (translate (-500) (700) $ text ("Press anything for next round"))
 
 		-- matrix table
 		box = rectangleWire 1000 600
@@ -132,15 +136,24 @@ defaultMain = play window background 5 initialState chooseRender handleInput ste
 
 
 
---getGrid :: Boolean -> Boolean -> Integer
 
---getGrid True True = 1
---getGrid True False = 2
---getGrid False True = 3
---getGrid False False = 4
+getGrid :: Integer -> Integer -> Integer
+getGrid 1 1 = 1
+getGrid 1 2 = 2
+getGrid 2 1 = 3
+getGrid 2 2 = 4
 
---calculateScoreP1 :: [[Integer]] -> Boolean -> Boolean -> Integer
---calculateScoreP1 b p1 p2 = 
+calculateScoreP1 :: [[Integer]] -> Integer -> Integer
+calculateScoreP1 b 1 = b!!0!!0
+calculateScoreP1 b 2 = b!!1!!0
+calculateScoreP1 b 3 = b!!2!!0
+calculateScoreP1 b 4 = b!!3!!0
+
+calculateScoreP2 :: [[Integer]] -> Integer -> Integer
+calculateScoreP2 b 1 = b!!0!!1
+calculateScoreP2 b 2 = b!!1!!1
+calculateScoreP2 b 3 = b!!2!!1
+calculateScoreP2 b 4 = b!!3!!1
 
 
 -- | Player selects keys 
@@ -148,144 +161,71 @@ handleInput :: Event -> CoordinationGame -> CoordinationGame
 
 
 -- | Player 1 selects key 1 selects row 1
-{-
-handleInput (EventKey (Char '1') _ _ _) game =
-	game { selectP1 = take 2 (board game) }
-	-}
 
 handleInput (EventKey (Char 'a') Down _ _) game =
-	--if not(p1Select game)
-	--	then
-	--		game { p1Select = True, scoreP1 = 1 }
-	--	else if not(p2Select game) && p1Select game
-	--		then
-	--			game { p2Select = True, scoreP2 = 5 }
-	--		else if p2Select game && p1Select game
-	--			then
-	--				game { board = board2, p2Select = False, p1Select = False, scoreP1 = 2 }
-	--			else 
-	--				game { board = board2, scoreP2 = 3 }
-
-	
 	if p2Select game && p1Select game
 		then
-			game { board = case listToMaybe (boardList game) of
+			game { 
+				scoreP1 = scoreP1 game + calculateScoreP1 (board game) (getGrid (p1Selection game) (p2Selection game)),
+				scoreP2 = scoreP2 game + calculateScoreP2 (board game) (getGrid (p1Selection game) (p2Selection game)),
+				board = case listToMaybe (boardList game) of
 								Nothing -> []
 								Just first -> first
-				
-
-
 				,
 				boardList = drop 1 (boardList game),
 				p2Selection = 0,
 				p1Selection = 0, 
 				p2Select = False, 
-				p1Select = False, 
-				scoreP1 = 2
+				p1Select = False
 			}
-
 			else
 				if not(p2Select game) && p1Select game
 					then
-						game { p2Select = True, turnP1 = False, p2Selection = 1, scoreP2 = 0 }
+						game { p2Select = True, turnP1 = True, p2Selection = 1 }
 						else
 							if not(p1Select game)
 								then
-									game { p1Select = True, turnP1 = True, p1Selection = 1, scoreP1 = 0 }
+									game { p1Select = True, turnP1 = False, p1Selection = 1 }
 									else 
 										game
 
-{-
--- | Player 1 selects key 2 selects row 2
-handleInput (EventKey (Char '2') _ _ _) game =
-  	game { selectP1 = drop 2 (board game)
-  		, endGame = True }
-
-
--- | Player 2 selects key 3 selects column 1
-handleInput (EventKey (Char '3') _ _ _) game =
-	game { selectP2 = take 1 (board game) ++ take 1 (drop 2 (board game)) }
-
--- | Player 2 selects key 4 selects column 2
-handleInput (EventKey (Char '4') _ _ _) game =
-	game { selectP2 = take 1 (drop 1 (board game)) ++ drop 3 (board game) }
-
--- Do nothing for all other events.
---handleInput _ game = game
--}
-
 --game { board = board2 }
 
---handleInput (EventKey (Char 'd') _ _ _) game =
---	if notp1Select game
---		then do
---			game { notp1Select = False, p1Selection = 2, scoreP1 = 1 }
---		else if notp2Select game && not(notp1Select game)
---			then
---				game { notp2Select = False, p2Selection = 2, scoreP2 = 1 }
---			else if not(notp2Select game) && not(notp1Select game)
---				then
---				game { board = board2, notp2Select = False, notp1Select = False, scoreP1 = 2 }
+handleInput (EventKey (Char 'd') Down _ _) game =
+	if p2Select game && p1Select game
+		then
+			game { 
+				scoreP1 = scoreP1 game + calculateScoreP1 (board game) (getGrid (p1Selection game) (p2Selection game)),
+				scoreP2 = scoreP2 game + calculateScoreP2 (board game) (getGrid (p1Selection game) (p2Selection game)),
+				board = case listToMaybe (boardList game) of
+								Nothing -> []
+								Just first -> first
+				,
+				boardList = drop 1 (boardList game),
+				p2Selection = 0,
+				p1Selection = 0, 
+				p2Select = False, 
+				p1Select = False
+			}
+			else
+				if not(p2Select game) && p1Select game
+					then
+						game { p2Select = True, turnP1 = True, p2Selection = 2 }
+						else
+							if not(p1Select game)
+								then
+									game { p1Select = True, turnP1 = False, p1Selection = 2 }
+									else 
+										game
 
 -- do nothing if other keys are pressed
 handleInput _ game = game
 
--- | Steps through game state
 step :: Float -> CoordinationGame -> CoordinationGame
 step _ w = w
 
-
-
---nashEquilibrium :: [[Integer]] -> Integer -> Float
---nashEquilibrium board 
-
--- num equals 1 initially
-selectFirst :: [Integer] -> Integer -> Integer
-selectFirst (a:b) 1 = a
-selectFirst (a:b) num = selectFirst b (num + 1)
-
-selectSecond :: [Integer] -> Integer -> Integer
-selectSecond (a:b) 2 = a
-selectSecond (a:b) num = selectSecond b (num + 1)
-
-
-
-
--- IO basic examples
--- how to print things in haskell
-io1 = putStrLn "Hello World!"
-
--- printing multiple lines
-io2 = do
-    putStrLn "The answer is: "
-    print 43
-
-io3 = do
-    print "The answer is: "
-    print 43
-
--- recieving user input
-io4 = do
-    str <- getLine
-    putStrLn str
-
-
-checkYes "y" = do
-	print "yes detected. Run function here to start game"
-checkYes "n" = do
-	print "no detected. Return to main menu"
-	main
-checkYes "q" = do
-	print "q detected. closing...."
-checkYes a = do
-	print "Sorry I don't understand"
-	main
-
--- Main allows a user to start a game
-main = do
-	print "Start game y/n, q to quit"
-	str <- getLine
-	checkYes str
+step :: Float -> CoordinationGame -> CoordinationGame
+step _ w = w
 
 
 -- test for interacting with lists
