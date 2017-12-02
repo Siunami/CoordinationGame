@@ -156,12 +156,10 @@ calculateScoreP2 b 3 = b!!2!!1
 calculateScoreP2 b 4 = b!!3!!1
 
 
--- | Player selects keys 
 handleInput :: Event -> CoordinationGame -> CoordinationGame
 
 
--- | Player 1 selects key 1 selects row 1
-
+-- | Handle key inputs for agreeing
 handleInput (EventKey (Char 'a') Down _ _) game =
 	if p2Select game && p1Select game
 		then
@@ -189,7 +187,7 @@ handleInput (EventKey (Char 'a') Down _ _) game =
 									else 
 										game
 
--- | Handle key inputs for game
+-- | Handle key inputs for disagreeing
 handleInput (EventKey (Char 'd') Down _ _) game =
 	if p2Select game && p1Select game
 		then
