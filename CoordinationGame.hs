@@ -22,8 +22,8 @@ background = white
 
 -- | Creates window
 window :: Display
-window = InWindow "Coordination Game" (width, height) (offset, offset)
-
+-- window = InWindow "Coordination Game" (width, height) (offset, offset)
+window = FullScreen
 
 -- | Game data structure
 data CoordinationGame = Game
