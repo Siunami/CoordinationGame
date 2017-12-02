@@ -224,9 +224,6 @@ handleInput _ game = game
 step :: Float -> CoordinationGame -> CoordinationGame
 step _ w = w
 
-step :: Float -> CoordinationGame -> CoordinationGame
-step _ w = w
-
 
 -- test for interacting with lists
 list1 = [1,2,3,4,5]
