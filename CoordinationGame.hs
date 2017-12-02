@@ -93,7 +93,7 @@ renderStart game =
 								then
 									translate (-500) (500) $ text ("Player 2 Turn")
 								else
-									rotate (-90) (translate (-500) (700) $ text ("Press anything for next round"))
+									translate (-850) (500) $ text ("Press any for next round")
 
 		-- matrix table
 		box = rectangleWire 1000 600
@@ -189,8 +189,7 @@ handleInput (EventKey (Char 'a') Down _ _) game =
 									else 
 										game
 
---game { board = board2 }
-
+-- | Handle key inputs for game
 handleInput (EventKey (Char 'd') Down _ _) game =
 	if p2Select game && p1Select game
 		then
